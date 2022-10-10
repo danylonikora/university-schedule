@@ -1,7 +1,11 @@
 import COMMANDS from "../constants/commands.js";
 
 export default function startCommandController(bot, msg) {
-  const html = "Добро пожаловать";
+  let html = "Привет 🙋, вот список команд этого бота:";
+  html += "\n\n";
+  html += `- ${COMMANDS.today}`;
+  html += "\n";
+  html += `- ${COMMANDS.next} (если в данный момент уже идёт пара, возвращает следующую после неё)`;
 
   bot.sendMessage(msg.chat.id, html, {
     parse_mode: "HTML",
