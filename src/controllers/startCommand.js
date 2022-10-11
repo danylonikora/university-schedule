@@ -10,7 +10,13 @@ export default function startCommandController(bot, msg) {
   bot.sendMessage(msg.chat.id, html, {
     parse_mode: "HTML",
     reply_markup: {
-      keyboard: [[{ text: COMMANDS.today }, { text: COMMANDS.next }]],
+      keyboard: [
+        [
+          { text: COMMANDS.today },
+          { text: COMMANDS.next },
+          { text: COMMANDS.whole },
+        ],
+      ],
       resize_keyboard: true,
     },
   });

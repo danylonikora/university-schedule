@@ -3,6 +3,7 @@ const COMMANDS = {
   today: "Расписание на сегодня",
   next: "Ближайшая пара",
   add: "Добавить пару",
+  whole: "Всё расписание",
 };
 
 export default COMMANDS;

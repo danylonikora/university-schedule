@@ -5,6 +5,7 @@ import addCommandController from "./controllers/addCommand.js";
 import COMMANDS from "./constants/commands.js";
 import requireUser from "./middlewares/requireUser.js";
 import requireAdmin from "./middlewares/requireAdmin.js";
+import wholeCommandController from "./controllers/wholeCommand.js";
 
 export default function commands(bot) {
   bot.on("message", (msg) => {
@@ -19,6 +20,9 @@ export default function commands(bot) {
         break;
       case COMMANDS.next:
         nextCommandController(bot, msg);
+        break;
+      case COMMANDS.whole:
+        wholeCommandController(bot, msg);
         break;
       case COMMANDS.add:
         requireAdmin(bot, msg, addCommandController.bind(null, bot, msg));
