@@ -22,5 +22,6 @@ export default async function registerUserController(bot, msg) {
     name: msg.from.first_name,
     subgroup: userSubgroup,
     is_admin: false,
+    is_notifications_on: true,
   });
 }

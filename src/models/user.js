@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   subgroup: { type: Number, required: true },
   is_admin: { type: Boolean, required: true },
+  is_notifications_on: { type: Boolean, required: true },
 });
 
 const User = mongoose.model("User", userSchema);

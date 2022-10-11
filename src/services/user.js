@@ -11,3 +11,14 @@ export async function findUser(id) {
 export async function makeAdmin(id) {
   return User.updateOne({ _id: id }, { $set: { is_admin: true } });
 }
+
+export async function getUsersWithNoficiationsOn() {
+  return User.find({ is_notifications_on: true });
+}
+
+export async function turnNotifications(state, id) {
+  return User.updateOne(
+    { _id: id },
+    { $set: { is_notifications_on: state == "on" ? true : false } }
+  );
+}

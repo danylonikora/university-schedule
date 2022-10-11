@@ -11,5 +11,6 @@ export default async function requireUser(bot, msg, next) {
   msg.user = {};
   msg.user.subgroup = user.subgroup;
   msg.user.is_admin = user.is_admin;
+  msg.user.is_notifications_on = user.is_notifications_on;
   next();
 }
