@@ -8,12 +8,12 @@ export default class InlineButtonBuilder {
     let paginatedButtonsRow;
 
     if (this.amountOfPages < 5) {
-      return this.allCallbackData.map((_, i) => {
-        paginatedButtonsRow = this.makePaginatedInlineButton(
+      paginatedButtonsRow = this.allCallbackData.map((_, i) =>
+        this.makePaginatedInlineButton(
           i,
           currentIndex == i ? "current" : "base"
-        );
-      });
+        )
+      );
     } else {
       switch (currentIndex) {
         case 0:

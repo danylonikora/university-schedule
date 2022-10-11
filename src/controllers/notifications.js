@@ -23,8 +23,8 @@ export default function notificationsController(bot) {
     mlsToNextClass = DAY_IN_MILLISECONDS + nextClassTmp - mlsFromStartOfDay;
   } else {
     isNextClassToday = true;
-    nextClassTmp = nextClassTmp.find((tmp) => tmp > mlsFromStartOfDay);
-    nextClassInx = nextClassTmp.indexOf(nextClassTmp);
+    nextClassTmp = classesStartTmps.find((tmp) => tmp > mlsFromStartOfDay);
+    nextClassInx = classesStartTmps.indexOf(nextClassTmp);
     mlsToNextClass = nextClassTmp - mlsFromStartOfDay;
   }
 
