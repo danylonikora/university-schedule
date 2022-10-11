@@ -29,3 +29,19 @@ export async function getNextClass(date, subgroup) {
   ]);
   return nextClasses[0];
 }
+
+export async function getAllNonEmptySchedules(date, subgroup) {
+  const allNonEmptySchedules = await Class.aggregate([
+    {
+      $match: {
+        subgroup: { $in: [0, subgroup] },
+        start: { $gt: date },
+      },
+    },
+    { $sort: { start: 1 } },
+    { $group: { _id: "$date", classes: { $push: "$$ROOT" } } },
+    { $sort: { _id: 1 } },
+    { $project: { _id: 0, date: "$_id", classes: 1 } },
+  ]);
+  return allNonEmptySchedules;
+}
