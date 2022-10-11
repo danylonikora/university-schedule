@@ -1,6 +1,5 @@
 import startCommandController from "./controllers/startCommand.js";
 import nextCommandController from "./controllers/nextCommand.js";
-import todayCommandController from "./controllers/todayCommand.js";
 import addCommandController from "./controllers/addCommand.js";
 import COMMANDS from "./constants/commands.js";
 import requireUser from "./middlewares/requireUser.js";
@@ -15,9 +14,6 @@ export default function commands(bot) {
   function commandsSwitch(msg) {
     console.log(msg);
     switch (msg.text) {
-      case COMMANDS.today:
-        todayCommandController(bot, msg);
-        break;
       case COMMANDS.next:
         nextCommandController(bot, msg);
         break;
