@@ -1,10 +1,10 @@
 import CLASSES from "../constants/classes.js";
 import * as fns from "date-fns";
-import fnsTz from "date-fns-tz";
 import { addClass } from "../services/class.js";
 import getStartOfDayTimestamp from "../utils/getStartOfDayTimestamp.js";
 import getTextFromNextMessage from "../utils/getTextFromNextMessage.js";
 import getCallbackData from "../utils/getCallbackData.js";
+import isWinterTime from "../utils/isWinterTime.js";
 
 export default async function addCommandController(bot, msg) {
   const isTwoClassesInlineButtons = [
@@ -125,12 +125,7 @@ export default async function addCommandController(bot, msg) {
   );
   input.location = classLocation;
 
-  if (
-    // winter time
-    fns.millisecondsToHours(
-      fnsTz.getTimezoneOffset("Europe/Kiev", input.date)
-    ) == 2
-  ) {
+  if (isWinterTime(input.date)) {
     // add 1 hour to start and end dates
     input.start += fns.hoursToMilliseconds(1);
     input.end += fns.hoursToMilliseconds(1);
