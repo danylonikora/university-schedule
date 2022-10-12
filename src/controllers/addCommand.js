@@ -7,22 +7,6 @@ import getCallbackData from "../utils/getCallbackData.js";
 import isWinterTime from "../utils/isWinterTime.js";
 
 export default async function addCommandController(bot, msg) {
-  const isTwoClassesInlineButtons = [
-    [
-      { text: "Да", callback_data: "true" },
-      { text: "Нет", callback_data: "false" },
-    ],
-  ];
-  const isTwoClasses =
-    (await getCallbackData(
-      bot,
-      msg.chat.id,
-      "Добавить две пары подряд?",
-      isTwoClassesInlineButtons
-    )) == "true"
-      ? true
-      : false;
-
   const input = {};
 
   const classNameInlineButtons = CLASSES.names.map((cls) => [
@@ -57,6 +41,27 @@ export default async function addCommandController(bot, msg) {
     classIndexInlineButtons
   );
   input.index = Number(classIndex);
+
+  let isTwoClasses;
+  if (input.index < 5) {
+    const isTwoClassesInlineButtons = [
+      [
+        { text: "Да", callback_data: "true" },
+        { text: "Нет", callback_data: "false" },
+      ],
+    ];
+    isTwoClasses =
+      (await getCallbackData(
+        bot,
+        msg.chat.id,
+        "Добавить две пары подряд?",
+        isTwoClassesInlineButtons
+      )) == "true"
+        ? true
+        : false;
+  } else {
+    isTwoClasses = false;
+  }
 
   const classTypeInlineButtons = CLASSES.types.map((type) => [
     { text: type, callback_data: type },
@@ -140,7 +145,13 @@ export default async function addCommandController(bot, msg) {
   if (isTwoClasses) {
     [newClass, newSecondClass] = await Promise.all([
       addClass(input),
-      addClass({ ...input, index: input.index + 1 }),
+      addClass({
+        ...input,
+        index: input.index + 1,
+        start: CLASSES.startUtcTimestamps[input.index + 1] + input.date,
+        end: (input.end =
+          CLASSES.endUtcTimestamps[input.index + 1] + input.date),
+      }),
     ]);
   } else {
     newClass = await addClass(input);
