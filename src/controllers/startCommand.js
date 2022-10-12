@@ -1,6 +1,5 @@
 import COMMANDS from "../constants/commands.js";
-import commandsButtonsController from "./commandsButtons.js";
-import { findUser } from "../services/user.js";
+import controllButtonsController from "./commandButtons.js";
 
 export default async function startCommandController(bot, msg) {
   let html = "Привет 🙋, вот список команд этого бота:";
@@ -10,7 +9,8 @@ export default async function startCommandController(bot, msg) {
   html += `- ${COMMANDS.next} (если в данный момент уже идёт пара, возвращает следующую после неё)`;
   html += "\n";
   html += `- ${COMMANDS.turnOnNotifications} - уведомления за 10 минут до начала пар`;
+  html += "\n";
+  html += `- ${COMMANDS.changeSubgroup}`;
 
-  const user = await findUser(msg.chat.id);
-  commandsButtonsController(bot, user, html, { parse_mode: "HTML" });
+  controllButtonsController(bot, msg, html, { parse_mode: "HTML" });
 }

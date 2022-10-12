@@ -29,3 +29,11 @@ export async function addUserActivity(id, activity, date) {
     { $push: { activity: { activity, date } } }
   );
 }
+
+export async function setUserButtonGroup(id, buttonGroup) {
+  return User.updateOne({ _id: id }, { $set: { button_group: buttonGroup } });
+}
+
+export async function changeUserSubgroup(id, subgroup) {
+  return User.updateOne({ _id: id }, { $set: { subgroup } });
+}

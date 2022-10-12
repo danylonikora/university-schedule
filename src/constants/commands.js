@@ -5,6 +5,7 @@ const COMMANDS = {
   whole: "Расписание",
   turnOnNotifications: "Включить уведомления",
   turnOffNotifications: "Выключить уведомления",
+  changeSubgroup: "Изменить подгруппу",
 };
 
 export default COMMANDS;

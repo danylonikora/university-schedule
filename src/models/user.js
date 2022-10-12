@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
   is_admin: { type: Boolean, required: true },
   is_notifications_on: { type: Boolean, required: true },
   registration_date: { type: Date, required: true },
+  button_group: { type: String, required: true, default: "main_commands" },
   activity: {
     type: [
       {

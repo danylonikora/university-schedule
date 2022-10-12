@@ -8,6 +8,9 @@ import wholeCommandController from "./controllers/wholeCommand.js";
 import turnOffNotificationsController from "./controllers/turnOffNotificationsCommand.js";
 import turnOnNotificationsController from "./controllers/turnOnNotificationsCommand.js";
 import activityMiddleware from "./middlewares/activity.js";
+import BUTTON_GROUPS from "./constants/buttonGoups.js";
+import commandButtonsController from "./controllers/commandButtons.js";
+import changeSubgroupController from "./controllers/changeSubgroupCommand.js";
 
 export default function commands(bot) {
   bot.on("message", (msg) => {
@@ -30,11 +33,18 @@ export default function commands(bot) {
       case COMMANDS.add:
         requireAdmin(bot, msg, addCommandController.bind(null, bot, msg));
         break;
+      case BUTTON_GROUPS.main_commands:
+      case BUTTON_GROUPS.settings:
+        commandButtonsController(bot, msg);
+        break;
       case COMMANDS.turnOffNotifications:
         turnOffNotificationsController(bot, msg);
         break;
       case COMMANDS.turnOnNotifications:
         turnOnNotificationsController(bot, msg);
+        break;
+      case COMMANDS.changeSubgroup:
+        changeSubgroupController(bot, msg);
         break;
       case COMMANDS.start:
         startCommandController(bot, msg);
