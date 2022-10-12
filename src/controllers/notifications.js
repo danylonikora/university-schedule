@@ -3,8 +3,10 @@ import { getNextClass } from "../services/class.js";
 import getStartOfDayTimestamp from "../utils/getStartOfDayTimestamp.js";
 import CLASSES from "../constants/classes.js";
 import MILLISECONDS_BEFORE_NOTIFICATION from "../constants/millisecondsBeforeNotification.js";
+import isWinterTime from "../utils/isWinterTime.js";
 
 const DAY_IN_MILLISECONDS = 86400000;
+const HOUR_IN_MILLISECONDS = 3600000;
 
 export default function notificationsController(bot) {
   const now = Date.now();
@@ -28,6 +30,7 @@ export default function notificationsController(bot) {
     mlsToNextClass = nextClassTmp - mlsFromStartOfDay;
   }
 
+  // TODO: consider DTS in intervals and timeouts
   classesStartTmps.forEach((tmp, i) => {
     let timeoutMls;
     if (i == nextClassInx) {
@@ -43,30 +46,65 @@ export default function notificationsController(bot) {
     timeoutMls -= MILLISECONDS_BEFORE_NOTIFICATION;
     setTimeout(() => {
       notifyUsers(new Date());
+      const mlsToNotification =
+        DAY_IN_MILLISECONDS - MILLISECONDS_BEFORE_NOTIFICATION;
+      let intervalDate;
       setInterval(
-        () => notifyUsers(new Date()),
-        DAY_IN_MILLISECONDS - MILLISECONDS_BEFORE_NOTIFICATION
+        () => {
+          intervalDate = new Date();
+          notifyUsers(intervalDate);
+        },
+        isWinterTime(intervalDate)
+          ? mlsToNotification + HOUR_IN_MILLISECONDS
+          : mlsToNotification
       );
     }, timeoutMls);
   });
 
   async function notifyUsers(date) {
-    const nextClass = await getNextClass();
+    const [firstGroupNextClass, secondGroupNextClass, users] =
+      await Promise.all([
+        getNextClass(date, 1),
+        getNextClass(date, 2),
+        getUsersWithNoficiationsOn(),
+      ]);
+    const startOfDayTmp = getStartOfDayTimestamp(date);
 
-    // if next class in not today
-    if (getStartOfDayTimestamp(date) != nextClass.date) {
-      return;
+    if (
+      firstGroupNextClass &&
+      startOfDayTmp == firstGroupNextClass.date.getTime()
+    ) {
+      users.forEach((user) => {
+        if (user.subgroup != 1) {
+          return;
+        }
+
+        bot.sendMessage(user._id, formatNotification(firstGroupNextClass), {
+          parse_mode: "HTML",
+        });
+      });
+    } else if (
+      secondGroupNextClass &&
+      startOfDayTmp == secondGroupNextClass.date.getTime()
+    ) {
+      users.forEach((user) => {
+        if (user.subgroup != 2) {
+          return;
+        }
+
+        bot.sendMessage(user._id, formatNotification(secondGroupNextClass), {
+          parse_mode: "HTML",
+        });
+      });
     }
-
-    const users = await getUsersWithNoficiationsOn();
-    let html = "";
-    html += `${nextClass.name} (${nextClass.type}) скоро начнётся`;
-    html += "\n";
-    html += nextClass.link_to_video;
-    users.forEach((user) =>
-      bot.sendMessage(user._id, html, {
-        parse_mode: "HTML",
-      })
-    );
   }
+}
+
+function formatNotification(cls) {
+  let html = "";
+  html += `${cls.name} (${cls.type}) скоро начнётся`;
+  html += "\n";
+  html += cls.link_to_video;
+
+  return html;
 }
