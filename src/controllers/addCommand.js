@@ -7,6 +7,22 @@ import getTextFromNextMessage from "../utils/getTextFromNextMessage.js";
 import getCallbackData from "../utils/getCallbackData.js";
 
 export default async function addCommandController(bot, msg) {
+  const isTwoClassesInlineButtons = [
+    [
+      { text: "Да", callback_data: "true" },
+      { text: "Нет", callback_data: "false" },
+    ],
+  ];
+  const isTwoClasses =
+    (await getCallbackData(
+      bot,
+      msg.chat.id,
+      "Добавить две пары подряд?",
+      isTwoClassesInlineButtons
+    )) == "true"
+      ? true
+      : false;
+
   const input = {};
 
   const classNameInlineButtons = CLASSES.names.map((cls) => [
@@ -124,6 +140,21 @@ export default async function addCommandController(bot, msg) {
   const classLink = await getTextFromNextMessage(bot, linkMessage);
   input.link_to_video_call = classLink;
 
-  const newClass = await addClass(input);
-  bot.sendMessage(msg.chat.id, JSON.stringify(newClass, null, 2));
+  let newClass;
+  let newSecondClass;
+  if (isTwoClasses) {
+    [newClass, newSecondClass] = await Promise.all([
+      addClass(input),
+      addClass({ ...input, index: input.index + 1 }),
+    ]);
+  } else {
+    newClass = await addClass(input);
+  }
+  let text = "";
+  text += `1. ${JSON.stringify(newClass, null, 2)}`;
+  if (isTwoClasses) {
+    text += "\n\n";
+    text += `2. ${JSON.stringify(newSecondClass, null, 2)}`;
+  }
+  bot.sendMessage(msg.chat.id, text);
 }
