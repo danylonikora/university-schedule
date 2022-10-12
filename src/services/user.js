@@ -22,3 +22,10 @@ export async function turnNotifications(state, id) {
     { $set: { is_notifications_on: state == "on" ? true : false } }
   );
 }
+
+export async function addUserActivity(id, activity, date) {
+  return User.updateOne(
+    { _id: id },
+    { $push: { activity: { activity, date } } }
+  );
+}

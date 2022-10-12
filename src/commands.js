@@ -7,10 +7,15 @@ import requireAdmin from "./middlewares/requireAdmin.js";
 import wholeCommandController from "./controllers/wholeCommand.js";
 import turnOffNotificationsController from "./controllers/turnOffNotificationsCommand.js";
 import turnOnNotificationsController from "./controllers/turnOnNotificationsCommand.js";
+import activityMiddleware from "./middlewares/activity.js";
 
 export default function commands(bot) {
   bot.on("message", (msg) => {
-    requireUser(bot, msg, commandsSwitch.bind(null, msg));
+    requireUser(
+      bot,
+      msg,
+      activityMiddleware.bind(null, bot, msg, commandsSwitch.bind(null, msg))
+    );
   });
 
   function commandsSwitch(msg) {
