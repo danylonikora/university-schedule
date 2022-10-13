@@ -104,7 +104,7 @@ function formatNotification(cls) {
   let html = "";
   html += `${cls.name} (${cls.type}) скоро начнётся`;
   html += "\n";
-  html += cls.link_to_video;
+  html += cls.link_to_video_call;
 
   return html;
 }
