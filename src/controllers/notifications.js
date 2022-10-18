@@ -3,10 +3,8 @@ import { getNextClass } from "../services/class.js";
 import getStartOfDayTimestamp from "../utils/getStartOfDayTimestamp.js";
 import CLASSES from "../constants/classes.js";
 import MILLISECONDS_BEFORE_NOTIFICATION from "../constants/millisecondsBeforeNotification.js";
-import isWinterTime from "../utils/isWinterTime.js";
 
 const DAY_IN_MILLISECONDS = 86400000;
-const HOUR_IN_MILLISECONDS = 3600000;
 
 export default function notificationsController(bot) {
   const now = Date.now();
@@ -46,18 +44,12 @@ export default function notificationsController(bot) {
     timeoutMls -= MILLISECONDS_BEFORE_NOTIFICATION;
     setTimeout(() => {
       notifyUsers(new Date());
+      
       const mlsToNotification =
         DAY_IN_MILLISECONDS - MILLISECONDS_BEFORE_NOTIFICATION;
-      let intervalDate;
-      setInterval(
-        () => {
-          intervalDate = new Date();
-          notifyUsers(intervalDate);
-        },
-        isWinterTime(intervalDate)
-          ? mlsToNotification + HOUR_IN_MILLISECONDS
-          : mlsToNotification
-      );
+      setInterval(() => {
+        notifyUsers(new Date());
+      }, mlsToNotification);
     }, timeoutMls);
   });
 
