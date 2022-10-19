@@ -8,7 +8,7 @@ export default async function startCommandController(bot, msg) {
   html += "\n";
   html += `- ${COMMANDS.next} (если в данный момент уже идёт пара, возвращает следующую после неё)`;
   html += "\n";
-  html += `- ${COMMANDS.turnOnNotifications} - уведомления за 10 минут до начала пар`;
+  html += `- ${COMMANDS.turnOnNotifications} - уведомления за 5 минут до начала пар`;
   html += "\n";
   html += `- ${COMMANDS.changeSubgroup}`;
 

@@ -1,5 +1,3 @@
-import * as fns from "date-fns";
-
-const MILLISECONDS_BEFORE_NOTIFICATION = fns.minutesToMilliseconds(10);
+const MILLISECONDS_BEFORE_NOTIFICATION = 360000; // 5 minutes
 
 export default MILLISECONDS_BEFORE_NOTIFICATION;

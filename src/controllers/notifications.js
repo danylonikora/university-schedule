@@ -1,94 +1,71 @@
 import { getUsersWithNoficiationsOn } from "../services/user.js";
 import { getNextClass } from "../services/class.js";
-import getStartOfDayTimestamp from "../utils/getStartOfDayTimestamp.js";
 import CLASSES from "../constants/classes.js";
 import MILLISECONDS_BEFORE_NOTIFICATION from "../constants/millisecondsBeforeNotification.js";
 
-const DAY_IN_MILLISECONDS = 86400000;
+export default async function notificationsController(bot) {
+  async function recSetNotificationTimeouts() {
+    const date = new Date();
+    const now = date.getTime();
+    const [firstSubgroupNextClass, secondSubgroupNextClass] = await Promise.all(
+      [getNextClass(date, 1), getNextClass(date, 2)]
+    );
+    if (!firstSubgroupNextClass || !secondSubgroupNextClass) {
+      return;
+    }
+    const firstNextClassStartTmp = firstSubgroupNextClass.date.getTime();
+    const secondNextClassStartTmp = secondSubgroupNextClass.date.getTime();
+    const mlsToFirstNextClass =
+      firstNextClassStartTmp +
+      CLASSES.startUtcTimestamps[firstSubgroupNextClass.index] -
+      now;
+    const mlsToSecondNextClass =
+      secondNextClassStartTmp +
+      CLASSES.startUtcTimestamps[secondSubgroupNextClass.index] -
+      now;
 
-export default function notificationsController(bot) {
-  const now = Date.now();
-  const mlsFromStartOfDay = now - getStartOfDayTimestamp(now);
-  const classesStartTmps = CLASSES.startUtcTimestamps;
-  let mlsToNextClass;
-  let nextClassInx;
-  let nextClassTmp;
-  let isNextClassToday;
+    await Promise.all([
+      new Promise((resolve) => {
+        if (
+          mlsToFirstNextClass < MILLISECONDS_BEFORE_NOTIFICATION ||
+          firstNextClassStartTmp > secondNextClassStartTmp
+        ) {
+          resolve();
+          return;
+        }
+        setTimeout(() => {
+          notifyUsers(firstSubgroupNextClass, 1);
+          resolve();
+        }, mlsToSecondNextClass - MILLISECONDS_BEFORE_NOTIFICATION);
+      }),
+      new Promise((resolve) => {
+        if (
+          mlsToSecondNextClass < MILLISECONDS_BEFORE_NOTIFICATION ||
+          secondNextClassStartTmp > firstNextClassStartTmp
+        ) {
+          resolve();
+          return;
+        }
+        setTimeout(() => {
+          notifyUsers(secondSubgroupNextClass, 2);
+          resolve();
+        }, mlsToSecondNextClass - MILLISECONDS_BEFORE_NOTIFICATION);
+      }),
+    ]);
 
-  // if all classes finnished today
-  if (mlsFromStartOfDay > classesStartTmps[classesStartTmps.length - 1]) {
-    isNextClassToday = false;
-    nextClassTmp = classesStartTmps[0];
-    nextClassInx = 0;
-    mlsToNextClass = DAY_IN_MILLISECONDS + nextClassTmp - mlsFromStartOfDay;
-  } else {
-    isNextClassToday = true;
-    nextClassTmp = classesStartTmps.find((tmp) => tmp > mlsFromStartOfDay);
-    nextClassInx = classesStartTmps.indexOf(nextClassTmp);
-    mlsToNextClass = nextClassTmp - mlsFromStartOfDay;
+    recSetNotificationTimeouts();
   }
+  recSetNotificationTimeouts();
 
-  // TODO: consider DTS in intervals and timeouts
-  classesStartTmps.forEach((tmp, i) => {
-    let timeoutMls;
-    if (i == nextClassInx) {
-      timeoutMls = mlsToNextClass;
-    } else {
-      if (isNextClassToday && i < nextClassInx) {
-        timeoutMls = DAY_IN_MILLISECONDS - (mlsFromStartOfDay - tmp);
-      } else {
-        timeoutMls = tmp - nextClassTmp + mlsToNextClass;
+  async function notifyUsers(cls, subgroup) {
+    const users = await getUsersWithNoficiationsOn();
+    users.forEach((user) => {
+      if (user.subgroup == subgroup) {
+        bot.sendMessage(user._id, formatNotification(cls), {
+          parse_mode: "HTML",
+        });
       }
-    }
-
-    timeoutMls -= MILLISECONDS_BEFORE_NOTIFICATION;
-    setTimeout(() => {
-      notifyUsers(new Date());
-      
-      const mlsToNotification =
-        DAY_IN_MILLISECONDS - MILLISECONDS_BEFORE_NOTIFICATION;
-      setInterval(() => {
-        notifyUsers(new Date());
-      }, mlsToNotification);
-    }, timeoutMls);
-  });
-
-  async function notifyUsers(date) {
-    const [firstGroupNextClass, secondGroupNextClass, users] =
-      await Promise.all([
-        getNextClass(date, 1),
-        getNextClass(date, 2),
-        getUsersWithNoficiationsOn(),
-      ]);
-    const startOfDayTmp = getStartOfDayTimestamp(date);
-
-    if (
-      firstGroupNextClass &&
-      startOfDayTmp == firstGroupNextClass.date.getTime()
-    ) {
-      users.forEach((user) => {
-        if (user.subgroup != 1) {
-          return;
-        }
-
-        bot.sendMessage(user._id, formatNotification(firstGroupNextClass), {
-          parse_mode: "HTML",
-        });
-      });
-    } else if (
-      secondGroupNextClass &&
-      startOfDayTmp == secondGroupNextClass.date.getTime()
-    ) {
-      users.forEach((user) => {
-        if (user.subgroup != 2) {
-          return;
-        }
-
-        bot.sendMessage(user._id, formatNotification(secondGroupNextClass), {
-          parse_mode: "HTML",
-        });
-      });
-    }
+    });
   }
 }
 
