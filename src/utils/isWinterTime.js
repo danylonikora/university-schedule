@@ -1,5 +1,6 @@
 import fnsTz from "date-fns-tz";
 
 export default function isWinterTime(date) {
-  return fnsTz.getTimezoneOffset("Europe/Kiev", date) == 2;
+  const offsetMls = fnsTz.getTimezoneOffset("Europe/Kiev", date);
+  return offsetMls / 1000 / 60 / 60 == 2;
 }
