@@ -37,6 +37,6 @@ const CLASSES = {
     "Бизнес планирование",
   ],
   locations: { online: ["Zoom", "Teams"] },
-  types: ["Лекция", "Практическая"],
+  types: ["Лекция", "Практическая", "Консультация", "Экзамен"],
 };
 export default CLASSES;
