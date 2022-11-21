@@ -9,9 +9,11 @@ export default async function wholeCommandController(bot, msg) {
   );
 
   if (schedules.length == 1) {
-    return bot.sendMessage(msg.chat.id, formatScheduleInfo(schedules[0]));
+    return bot.sendMessage(msg.chat.id, formatScheduleInfo(schedules[0]), {
+      parse_mode: "HTML",
+    });
   }
-  
+
   const ibb = new InlineButtonBuilder(
     schedules.map((schedule) => schedule.date.getTime())
   );
