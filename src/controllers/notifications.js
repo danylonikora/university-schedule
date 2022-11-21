@@ -3,6 +3,8 @@ import { getNextClass } from "../services/class.js";
 import CLASSES from "../constants/classes.js";
 import MILLISECONDS_BEFORE_NOTIFICATION from "../constants/millisecondsBeforeNotification.js";
 
+const HOUR_IN_MLS = 3600000;
+
 export default async function notificationsController(bot) {
   async function recSetNotificationTimeouts() {
     const date = new Date();
@@ -24,6 +26,7 @@ export default async function notificationsController(bot) {
       CLASSES.startUtcTimestamps[secondSubgroupNextClass.index] -
       now;
 
+    // TODO: Automatically add one hour if current time is winter
     await Promise.all([
       new Promise((resolve) => {
         if (
@@ -36,7 +39,7 @@ export default async function notificationsController(bot) {
         setTimeout(() => {
           notifyUsers(firstSubgroupNextClass, 1);
           resolve();
-        }, mlsToSecondNextClass - MILLISECONDS_BEFORE_NOTIFICATION);
+        }, mlsToSecondNextClass - MILLISECONDS_BEFORE_NOTIFICATION + HOUR_IN_MLS);
       }),
       new Promise((resolve) => {
         if (
@@ -49,7 +52,7 @@ export default async function notificationsController(bot) {
         setTimeout(() => {
           notifyUsers(secondSubgroupNextClass, 2);
           resolve();
-        }, mlsToSecondNextClass - MILLISECONDS_BEFORE_NOTIFICATION);
+        }, mlsToSecondNextClass - MILLISECONDS_BEFORE_NOTIFICATION + HOUR_IN_MLS);
       }),
     ]);
 
