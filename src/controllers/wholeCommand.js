@@ -7,17 +7,28 @@ export default async function wholeCommandController(bot, msg) {
     new Date(msg.date * 1000),
     msg.user.subgroup
   );
+
+  if (schedules.length == 1) {
+    return bot.sendMessage(msg.chat.id, formatScheduleInfo(schedules[0]));
+  }
+  
   const ibb = new InlineButtonBuilder(
     schedules.map((schedule) => schedule.date.getTime())
   );
   let currentPageIndex = 0;
   let inlineButtons = ibb.getPaginatedButtons(currentPageIndex);
+  let currentSchedule = schedules[currentPageIndex];
 
-  const message = await bot.sendMessage(
-    msg.chat.id,
-    formatScheduleInfo(schedules[currentPageIndex]),
-    { parse_mode: "HTML", reply_markup: { inline_keyboard: inlineButtons } }
-  );
+  let message;
+  if (currentSchedule) {
+    message = await bot.sendMessage(
+      msg.chat.id,
+      formatScheduleInfo(schedules[currentPageIndex]),
+      { parse_mode: "HTML", reply_markup: { inline_keyboard: inlineButtons } }
+    );
+  } else {
+    return bot.sendMessage(msg.chat_id, "Пар в расписании нет");
+  }
 
   bot.on("callback_query", (callbackQuery) => {
     if (callbackQuery.message.message_id != message.message_id) {
